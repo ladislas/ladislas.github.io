@@ -1,0 +1,27 @@
+---
+---
+
+<button type="button" id="theme-toggle" class="toggle-btn" aria-label="Switch to light theme">
+  Light
+</button>
+
+<script>
+  const btn = document.getElementById('theme-toggle');
+
+  if (btn) {
+    const sync = () => {
+      const isDark = (document.documentElement.getAttribute('data-theme') ?? 'dark') === 'dark';
+      btn.textContent = isDark ? 'Light' : 'Dark';
+      btn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+    };
+
+    btn.addEventListener('click', () => {
+      const next = (document.documentElement.getAttribute('data-theme') ?? 'dark') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('wt-theme', next); } catch (_) {}
+      sync();
+    });
+
+    sync();
+  }
+</script>

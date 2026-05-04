@@ -1,0 +1,37 @@
+---
+---
+
+<button
+  type="button"
+  id="clarity-toggle"
+  class="toggle-btn"
+  aria-pressed="false"
+  aria-label="Enable High Clarity mode"
+>
+  High Clarity
+</button>
+
+<script>
+  const btn = document.getElementById('clarity-toggle');
+
+  if (btn) {
+    const sync = () => {
+      const active = document.documentElement.hasAttribute('data-clarity');
+      btn.setAttribute('aria-pressed', String(active));
+      btn.setAttribute('aria-label', active ? 'Disable High Clarity mode' : 'Enable High Clarity mode');
+    };
+
+    btn.addEventListener('click', () => {
+      if (document.documentElement.hasAttribute('data-clarity')) {
+        document.documentElement.removeAttribute('data-clarity');
+        try { localStorage.removeItem('wt-clarity'); } catch (_) {}
+      } else {
+        document.documentElement.setAttribute('data-clarity', 'high');
+        try { localStorage.setItem('wt-clarity', 'high'); } catch (_) {}
+      }
+      sync();
+    });
+
+    sync();
+  }
+</script>

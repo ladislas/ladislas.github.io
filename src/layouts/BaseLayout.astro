@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import ClarityToggle from '../components/ClarityToggle.astro';
 
 interface Props {
   title: string;
@@ -16,6 +18,17 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Inline: apply saved theme/clarity before first paint to prevent flash -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('wt-theme') || 'dark';
+          var c = localStorage.getItem('wt-clarity');
+          document.documentElement.setAttribute('data-theme', t);
+          if (c === 'high') document.documentElement.setAttribute('data-clarity', 'high');
+        } catch (_) {}
+      })();
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="alternate" type="application/rss+xml" title="Workshop Terminal RSS" href="/rss.xml" />
@@ -36,6 +49,10 @@ const {
           <a href="/routes/">Routes</a>
           <a href="/rss.xml">RSS</a>
         </nav>
+        <div class="site-controls">
+          <ThemeToggle />
+          <ClarityToggle />
+        </div>
       </div>
     </header>
 
