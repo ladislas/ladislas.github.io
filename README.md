@@ -31,3 +31,23 @@ See `CONTEXT.md` for the full shared vocabulary and domain rules.
 ## Status
 
 This repository is being bootstrapped from the Workshop Terminal PRDs.
+
+## Development
+
+This repo uses `mise` for tool installation and `hk` for versioned pre-commit checks.
+
+### Bootstrap
+
+- Install `mise`: `brew install mise`
+- Trust the repo config: `mise trust`
+- Install repo-managed tools: `mise install`
+- Install the git hook: `mise run hooks`
+
+### Linting
+
+- Run all checks: `mise run lint`
+- Run Markdown checks: `mise run lint:markdown`
+- Run YAML checks: `mise run lint:yaml`
+- Auto-fix Markdown lint issues: `mise run lint:fix`
+
+The hook setup also includes the generic built-in checks from `hk`, including a guard against committing directly to `main`.
