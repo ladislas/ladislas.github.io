@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
   formatDate,
   isPublishedLog,
+  isPublishedProject,
   sortLogsByDateDesc,
   sortProjectsByUpdatedDesc,
 } from '../../lib/content';
@@ -20,10 +21,15 @@ export async function getStaticPaths() {
 const { route } = Astro.props;
 const logs = (await getCollection('logs'))
   .filter(isPublishedLog)
-  .filter((log) => log.data.route.id === route.id)
+  .filter((log) => log.data.primaryRoute === route.id)
   .sort(sortLogsByDateDesc);
 const projects = (await getCollection('projects'))
-  .filter((project) => project.data.route.id === route.id)
+  .filter(isPublishedProject)
+  .filter(
+    (project) =>
+      project.data.primaryRoute === route.id
+      || project.data.routes.some((routeId) => routeId === route.id),
+  )
   .sort(sortProjectsByUpdatedDesc);
 const { Content } = await render(route);
 ---

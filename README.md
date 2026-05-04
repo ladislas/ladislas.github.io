@@ -32,6 +32,19 @@ See `CONTEXT.md` for the full shared vocabulary and domain rules.
 
 This repository is being bootstrapped from the Workshop Terminal PRDs.
 
+## Authoring workflow
+
+For v1, the publishing workflow stays Git-based:
+
+1. Draft a Log or Project in `src/content/`.
+2. Choose a Cover.
+3. Generate card and hero crops.
+4. Add the required metadata.
+5. Preview locally with `pnpm dev`.
+6. Publish through GitHub.
+
+Published Logs and Projects should include Cover metadata. Drafts may omit Cover fields while the writing is still in progress.
+
 ## Development
 
 This repo uses `mise` for tool installation and `hk` for versioned pre-commit checks.

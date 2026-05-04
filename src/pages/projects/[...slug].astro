@@ -1,10 +1,10 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content';
+import { getCollection, getEntries, getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDate, isPublishedLog } from '../../lib/content';
+import { formatDate, isPublishedProject } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
+  const projects = (await getCollection('projects')).filter(isPublishedProject);
 
   return projects.map((project) => ({
     params: { slug: project.id },
@@ -13,28 +13,64 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const route = await getEntry(project.data.route);
-const relatedLogs = (await getCollection('logs'))
-  .filter(isPublishedLog)
-  .filter((log) =>
-    log.data.relatedProjects.some((relatedProject) => relatedProject.id === project.id),
+const primaryRoute = await getEntry('routes', project.data.primaryRoute);
+
+if (!primaryRoute) {
+  throw new Error(
+    `Missing primary route entry '${project.data.primaryRoute}' for Project '${project.id}'.`,
   );
+}
+
+const additionalRouteEntries = await Promise.all(
+  project.data.routes.map((routeId) => getEntry('routes', routeId)),
+);
+const missingRouteIndex = additionalRouteEntries.findIndex((route) => !route);
+const missingRouteId =
+  missingRouteIndex === -1 ? undefined : project.data.routes[missingRouteIndex];
+
+if (missingRouteId) {
+  throw new Error(`Missing additional route entry '${missingRouteId}' for Project '${project.id}'.`);
+}
+
+const additionalRoutes = additionalRouteEntries as NonNullable<
+  (typeof additionalRouteEntries)[number]
+>[];
+const relatedLogs = await getEntries(project.data.relatedLogs);
 const { Content } = await render(project);
 ---
 
 <BaseLayout
   title={`${project.data.title} | Workshop Terminal`}
-  description={project.data.description}
+  description={project.data.summary}
 >
   <article class="prose">
     <p class="eyebrow">Project</p>
     <h1>{project.data.title}</h1>
-    <p class="lede">{project.data.description}</p>
+    {project.data.subtitle && <p class="lede">{project.data.subtitle}</p>}
+    <p>{project.data.summary}</p>
     <p class="meta">
       <span>Status: {project.data.status}</span>
-      <span>Updated {formatDate(project.data.updatedAt)}</span>
-      {route && <span>Route: <a href={`/routes/${route.id}/`}>{route.data.title}</a></span>}
+      {project.data.updatedAt && <span>Updated {formatDate(project.data.updatedAt)}</span>}
+      <span>Primary Route: <a href={`/routes/${primaryRoute.id}/`}>{primaryRoute.data.title}</a></span>
     </p>
+
+    {additionalRoutes.length > 0 && (
+      <p class="meta">
+        <span>
+          Also on:{' '}
+          {additionalRoutes.map((route, index) => (
+            <>
+              {index > 0 && ', '}
+              <a href={`/routes/${route.id}/`}>{route.data.title}</a>
+            </>
+          ))}
+        </span>
+      </p>
+    )}
+
+    {project.data.updatedAt && project.data.revisionNote && (
+      <p class="meta">Revision note: {project.data.revisionNote}</p>
+    )}
 
     {project.data.tags.length > 0 && (
       <ul class="tag-list" aria-label="Tags">
@@ -45,6 +81,19 @@ const { Content } = await render(project);
     )}
 
     <Content />
+
+    {project.data.relatedLinks.length > 0 && (
+      <section class="panel">
+        <h2>Related Links</h2>
+        <ul>
+          {project.data.relatedLinks.map((link) => (
+            <li>
+              <a href={link.url}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
 
     {relatedLogs.length > 0 && (
       <section class="panel">

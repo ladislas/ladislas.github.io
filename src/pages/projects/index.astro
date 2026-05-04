@@ -1,13 +1,18 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDate, sortProjectsByUpdatedDesc } from '../../lib/content';
+import {
+  formatDate,
+  isPublishedProject,
+  sortProjectsByUpdatedDesc,
+  sortRoutesByOrder,
+} from '../../lib/content';
 
-const projects = (await getCollection('projects')).sort(sortProjectsByUpdatedDesc);
-const routeEntries = await Promise.all(projects.map((project) => getEntry(project.data.route)));
-const routesById = new Map(
-  routeEntries.filter((r): r is NonNullable<typeof r> => r != null).map((route) => [route.id, route]),
-);
+const projects = (await getCollection('projects'))
+  .filter(isPublishedProject)
+  .sort(sortProjectsByUpdatedDesc);
+const routes = (await getCollection('routes')).sort(sortRoutesByOrder);
+const routesById = new Map(routes.map((route) => [route.id, route]));
 ---
 
 <BaseLayout title="Projects | Workshop Terminal" description="Project hubs.">
@@ -24,11 +29,13 @@ const routesById = new Map(
           <h2>
             <a href={`/projects/${project.id}/`}>{project.data.title}</a>
           </h2>
-          <p>{project.data.description}</p>
+          <p>{project.data.summary}</p>
           <p class="meta">
             <span>Status: {project.data.status}</span>
-            <span>Updated {formatDate(project.data.updatedAt)}</span>
-            <span>Route: {routesById.get(project.data.route.id)?.data.title ?? project.data.route.id}</span>
+            {project.data.updatedAt && <span>Updated {formatDate(project.data.updatedAt)}</span>}
+            <span>
+              Route: {routesById.get(project.data.primaryRoute)?.data.title ?? project.data.primaryRoute}
+            </span>
           </p>
         </li>
       ))}
