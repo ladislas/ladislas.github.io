@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  formatDate,
+  isPublishedLog,
+  sortLogsByDateDesc,
+  sortProjectsByUpdatedDesc,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const routes = await getCollection('routes');
+
+  return routes.map((route) => ({
+    params: { slug: route.id },
+    props: { route },
+  }));
+}
+
+const { route } = Astro.props;
+const logs = (await getCollection('logs'))
+  .filter(isPublishedLog)
+  .filter((log) => log.data.route.id === route.id)
+  .sort(sortLogsByDateDesc);
+const projects = (await getCollection('projects'))
+  .filter((project) => project.data.route.id === route.id)
+  .sort(sortProjectsByUpdatedDesc);
+const { Content } = await render(route);
+---
+
+<BaseLayout
+  title={`${route.data.title} | Workshop Terminal`}
+  description={route.data.description}
+>
+  <article class="prose">
+    <p class="eyebrow">Route</p>
+    <h1>{route.data.title}</h1>
+    <p class="lede">{route.data.description}</p>
+    <Content />
+
+    <section class="panel">
+      <h2>Logs</h2>
+      {logs.length === 0 ? (
+        <p>No Logs yet.</p>
+      ) : (
+        <ul>
+          {logs.map((log) => (
+            <li>
+              <a href={`/logs/${log.id}/`}>{log.data.title}</a>
+              {' '}
+              <span>({formatDate(log.data.publishedAt)})</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    <section class="panel">
+      <h2>Projects</h2>
+      {projects.length === 0 ? (
+        <p>No Projects yet.</p>
+      ) : (
+        <ul>
+          {projects.map((project) => (
+            <li>
+              <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+              {' '}
+              <span>({project.data.status})</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  </article>
+</BaseLayout>

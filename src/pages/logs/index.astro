@@ -1,0 +1,36 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isPublishedLog, sortLogsByDateDesc } from '../../lib/content';
+
+const logs = (await getCollection('logs')).filter(isPublishedLog).sort(sortLogsByDateDesc);
+const routeEntries = await Promise.all(logs.map((log) => getEntry(log.data.route)));
+const routesById = new Map(
+  routeEntries.filter((r): r is NonNullable<typeof r> => r != null).map((route) => [route.id, route]),
+);
+---
+
+<BaseLayout title="Logs | Workshop Terminal" description="Published Logs.">
+  <section class="hero">
+    <p class="eyebrow">Logs</p>
+    <h1>Published Logs</h1>
+    <p class="lede">Typed frontmatter, MDX when needed, and static output by default.</p>
+  </section>
+
+  <section>
+    <ul class="card-grid">
+      {logs.map((log) => (
+        <li class="card">
+          <h2>
+            <a href={`/logs/${log.id}/`}>{log.data.title}</a>
+          </h2>
+          <p>{log.data.description}</p>
+          <p class="meta">
+            <span>{formatDate(log.data.publishedAt)}</span>
+            <span>Route: {routesById.get(log.data.route.id)?.data.title ?? log.data.route.id}</span>
+          </p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

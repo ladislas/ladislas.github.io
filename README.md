@@ -41,7 +41,15 @@ This repo uses `mise` for tool installation and `hk` for versioned pre-commit ch
 - Install `mise`: `brew install mise`
 - Trust the repo config: `mise trust`
 - Install repo-managed tools: `mise install`
+- Install JavaScript dependencies: `pnpm install`
 - Install the git hook: `mise run hooks`
+
+### App commands
+
+- Start local dev server: `pnpm dev`
+- Run Astro type/content checks: `pnpm check`
+- Build the static site: `pnpm build`
+- Preview the production build: `pnpm preview`
 
 ### Linting
 

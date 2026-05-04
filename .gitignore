@@ -1,2 +1,7 @@
 node_modules/
+dist/
+.astro/
 /.pi/
+pnpm-debug.log*
+.env
+.env.production
