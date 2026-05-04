@@ -6,3 +6,19 @@ hk = "1.38.0"
 pkl = "0.31.0"
 markdownlint-cli2 = "0.21.0"
 yamllint = "1.37.1"
+
+[tasks.dev]
+description = "Start local dev server"
+run = "pnpm dev"
+
+[tasks.build]
+description = "Build the static site"
+run = "pnpm build"
+
+[tasks.preview]
+description = "Build and preview the production build"
+run = "pnpm build && pnpm preview"
+
+[tasks.check]
+description = "Run Astro type and content checks"
+run = "pnpm check"
