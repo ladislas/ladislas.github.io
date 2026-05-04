@@ -11,7 +11,7 @@ export async function GET(context: { site: URL | undefined }) {
     site: context.site ?? 'https://ladislas.github.io',
     items: logs.map((log) => ({
       title: log.data.title,
-      description: log.data.description,
+      description: log.data.summary,
       pubDate: log.data.publishedAt,
       link: `/logs/${log.id}/`,
     })),

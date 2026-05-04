@@ -1,13 +1,16 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDate, isPublishedLog, sortLogsByDateDesc } from '../../lib/content';
+import {
+  formatDate,
+  isPublishedLog,
+  sortLogsByDateDesc,
+  sortRoutesByOrder,
+} from '../../lib/content';
 
 const logs = (await getCollection('logs')).filter(isPublishedLog).sort(sortLogsByDateDesc);
-const routeEntries = await Promise.all(logs.map((log) => getEntry(log.data.route)));
-const routesById = new Map(
-  routeEntries.filter((r): r is NonNullable<typeof r> => r != null).map((route) => [route.id, route]),
-);
+const routes = (await getCollection('routes')).sort(sortRoutesByOrder);
+const routesById = new Map(routes.map((route) => [route.id, route]));
 ---
 
 <BaseLayout title="Logs | Workshop Terminal" description="Published Logs.">
@@ -21,13 +24,14 @@ const routesById = new Map(
     <ul class="card-grid">
       {logs.map((log) => (
         <li class="card">
+          <p class="eyebrow">{log.data.type}</p>
           <h2>
             <a href={`/logs/${log.id}/`}>{log.data.title}</a>
           </h2>
-          <p>{log.data.description}</p>
+          <p>{log.data.summary}</p>
           <p class="meta">
             <span>{formatDate(log.data.publishedAt)}</span>
-            <span>Route: {routesById.get(log.data.route.id)?.data.title ?? log.data.route.id}</span>
+            <span>Route: {routesById.get(log.data.primaryRoute)?.data.title ?? log.data.primaryRoute}</span>
           </p>
         </li>
       ))}

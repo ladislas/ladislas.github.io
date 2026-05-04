@@ -13,23 +13,35 @@ export async function getStaticPaths() {
 }
 
 const { log } = Astro.props;
-const route = await getEntry(log.data.route);
+const route = await getEntry('routes', log.data.primaryRoute);
+
+if (!route) {
+  throw new Error(`Missing route entry '${log.data.primaryRoute}' for Log '${log.id}'.`);
+}
+
 const relatedProjects = await getEntries(log.data.relatedProjects);
 const { Content } = await render(log);
 ---
 
 <BaseLayout
   title={`${log.data.title} | Workshop Terminal`}
-  description={log.data.description}
+  description={log.data.summary}
 >
   <article class="prose">
     <p class="eyebrow">Log</p>
     <h1>{log.data.title}</h1>
-    <p class="lede">{log.data.description}</p>
+    <p class="lede">{log.data.subtitle}</p>
+    <p>{log.data.summary}</p>
     <p class="meta">
+      <span>Type: {log.data.type}</span>
       <span>Published {formatDate(log.data.publishedAt)}</span>
-      {route && <span>Route: <a href={`/routes/${route.id}/`}>{route.data.title}</a></span>}
+      <span>Route: <a href={`/routes/${route.id}/`}>{route.data.title}</a></span>
+      {log.data.updatedAt && <span>Updated {formatDate(log.data.updatedAt)}</span>}
     </p>
+
+    {log.data.updatedAt && log.data.revisionNote && (
+      <p class="meta">Revision note: {log.data.revisionNote}</p>
+    )}
 
     {log.data.tags.length > 0 && (
       <ul class="tag-list" aria-label="Tags">
@@ -40,6 +52,28 @@ const { Content } = await render(log);
     )}
 
     <Content />
+
+    {log.data.relatedLinks.length > 0 && (
+      <section class="panel">
+        <h2>Related Links</h2>
+        <ul>
+          {log.data.relatedLinks.map((link) => (
+            <li>
+              <a href={link.url}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {log.data.discussionUrl && (
+      <section class="panel">
+        <h2>Discussion</h2>
+        <p>
+          <a href={log.data.discussionUrl}>Join the GitHub Discussion</a>
+        </p>
+      </section>
+    )}
 
     {relatedProjects.length > 0 && (
       <section class="panel">

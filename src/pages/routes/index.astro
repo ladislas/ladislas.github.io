@@ -1,8 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sortRoutesByOrder } from '../../lib/content';
 
-const routes = await getCollection('routes');
+const routes = (await getCollection('routes')).sort(sortRoutesByOrder);
 ---
 
 <BaseLayout title="Routes | Workshop Terminal" description="Curated topic destinations.">

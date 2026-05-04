@@ -4,13 +4,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import {
   formatDate,
   isPublishedLog,
+  isPublishedProject,
   sortLogsByDateDesc,
   sortProjectsByUpdatedDesc,
+  sortRoutesByOrder,
 } from '../lib/content';
 
 const logs = (await getCollection('logs')).filter(isPublishedLog).sort(sortLogsByDateDesc);
-const projects = (await getCollection('projects')).sort(sortProjectsByUpdatedDesc);
-const routes = await getCollection('routes');
+const projects = (await getCollection('projects'))
+  .filter(isPublishedProject)
+  .sort(sortProjectsByUpdatedDesc);
+const routes = (await getCollection('routes')).sort(sortRoutesByOrder);
+const routesById = new Map(routes.map((route) => [route.id, route]));
 ---
 
 <BaseLayout
@@ -32,13 +37,14 @@ const routes = await getCollection('routes');
       <ul class="card-grid">
         {logs.map((log) => (
           <li class="card">
+            <p class="eyebrow">{log.data.type}</p>
             <h3>
               <a href={`/logs/${log.id}/`}>{log.data.title}</a>
             </h3>
-            <p>{log.data.description}</p>
+            <p>{log.data.summary}</p>
             <p class="meta">
               <span>{formatDate(log.data.publishedAt)}</span>
-              <span>{log.data.tags.join(', ')}</span>
+              <span>Route: {routesById.get(log.data.primaryRoute)?.data.title ?? log.data.primaryRoute}</span>
             </p>
           </li>
         ))}
@@ -54,10 +60,13 @@ const routes = await getCollection('routes');
           <h2>
             <a href={`/projects/${project.id}/`}>{project.data.title}</a>
           </h2>
-          <p>{project.data.description}</p>
+          <p>{project.data.summary}</p>
           <p class="meta">
             <span>Status: {project.data.status}</span>
-            <span>Updated {formatDate(project.data.updatedAt)}</span>
+            {project.data.updatedAt && <span>Updated {formatDate(project.data.updatedAt)}</span>}
+            <span>
+              Route: {routesById.get(project.data.primaryRoute)?.data.title ?? project.data.primaryRoute}
+            </span>
           </p>
         </li>
       ))}
