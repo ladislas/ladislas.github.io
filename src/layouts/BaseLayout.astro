@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Notes from the quiet edge of building things.',
+} = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="alternate" type="application/rss+xml" title="Workshop Terminal RSS" href="/rss.xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell">
+        <a class="site-title" href="/">Workshop Terminal</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="/logs/">Logs</a>
+          <a href="/projects/">Projects</a>
+          <a href="/routes/">Routes</a>
+          <a href="/rss.xml">RSS</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="shell">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <p>Static by default with Astro, MDX, and GitHub Pages.</p>
+      </div>
+    </footer>
+  </body>
+</html>

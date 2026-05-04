@@ -1,0 +1,29 @@
+---
+title: Technical foundation demo
+description: A starter Log that proves Astro, MDX, content collections, and RSS work together.
+publishedAt: 2026-05-04
+route: workshop-terminal
+tags:
+  - astro
+  - mdx
+  - github-pages
+relatedProjects:
+  - workshop-terminal
+---
+
+import Callout from '../../components/Callout.astro';
+
+This starter Log exists to prove the v1 technical foundation end to end.
+
+<Callout variant="decision">
+  Astro + MDX keeps Workshop Terminal static-first while still allowing richer writing components when a Log needs them.
+</Callout>
+
+The setup in this repository now covers:
+
+- typed content collections for Logs, Projects, and Routes
+- static route generation for collection entries
+- RSS output for published Logs
+- a GitHub Pages deployment workflow
+
+That gives future content, information architecture, and visual design work a clean base without adding a backend or client-side app shell.

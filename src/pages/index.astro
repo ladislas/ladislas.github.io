@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {
+  formatDate,
+  isPublishedLog,
+  sortLogsByDateDesc,
+  sortProjectsByUpdatedDesc,
+} from '../lib/content';
+
+const logs = (await getCollection('logs')).filter(isPublishedLog).sort(sortLogsByDateDesc);
+const projects = (await getCollection('projects')).sort(sortProjectsByUpdatedDesc);
+const routes = await getCollection('routes');
+---
+
+<BaseLayout
+  title="Workshop Terminal"
+  description="Notes from the quiet edge of building things."
+>
+  <section class="hero">
+    <p class="eyebrow">Technical foundation</p>
+    <h1>Workshop Terminal</h1>
+    <p class="lede">
+      A static-first Astro site with typed content collections, MDX support, RSS,
+      and a GitHub Pages deployment path.
+    </p>
+  </section>
+
+  <section>
+    <div class="panel">
+      <h2>Latest Logs</h2>
+      <ul class="card-grid">
+        {logs.map((log) => (
+          <li class="card">
+            <h3>
+              <a href={`/logs/${log.id}/`}>{log.data.title}</a>
+            </h3>
+            <p>{log.data.description}</p>
+            <p class="meta">
+              <span>{formatDate(log.data.publishedAt)}</span>
+              <span>{log.data.tags.join(', ')}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <ul class="card-grid">
+      {projects.map((project) => (
+        <li class="card">
+          <p class="eyebrow">Project</p>
+          <h2>
+            <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+          </h2>
+          <p>{project.data.description}</p>
+          <p class="meta">
+            <span>Status: {project.data.status}</span>
+            <span>Updated {formatDate(project.data.updatedAt)}</span>
+          </p>
+        </li>
+      ))}
+      {routes.map((route) => (
+        <li class="card">
+          <p class="eyebrow">Route</p>
+          <h2>
+            <a href={`/routes/${route.id}/`}>{route.data.title}</a>
+          </h2>
+          <p>{route.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

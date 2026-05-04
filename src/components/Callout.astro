@@ -1,0 +1,22 @@
+---
+const labels = {
+  note: 'Note',
+  gotcha: 'Gotcha',
+  decision: 'Decision',
+  failure: 'Failure',
+  tip: 'Tip',
+  reference: 'Reference',
+} as const;
+
+interface Props {
+  variant: keyof typeof labels;
+  title?: string;
+}
+
+const { variant, title = labels[variant] } = Astro.props;
+---
+
+<aside class="callout" data-variant={variant} aria-label={title}>
+  <p class="callout-title">{title}</p>
+  <slot />
+</aside>

@@ -1,0 +1,62 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isPublishedLog } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const route = await getEntry(project.data.route);
+const relatedLogs = (await getCollection('logs'))
+  .filter(isPublishedLog)
+  .filter((log) =>
+    log.data.relatedProjects.some((relatedProject) => relatedProject.id === project.id),
+  );
+const { Content } = await render(project);
+---
+
+<BaseLayout
+  title={`${project.data.title} | Workshop Terminal`}
+  description={project.data.description}
+>
+  <article class="prose">
+    <p class="eyebrow">Project</p>
+    <h1>{project.data.title}</h1>
+    <p class="lede">{project.data.description}</p>
+    <p class="meta">
+      <span>Status: {project.data.status}</span>
+      <span>Updated {formatDate(project.data.updatedAt)}</span>
+      {route && <span>Route: <a href={`/routes/${route.id}/`}>{route.data.title}</a></span>}
+    </p>
+
+    {project.data.tags.length > 0 && (
+      <ul class="tag-list" aria-label="Tags">
+        {project.data.tags.map((tag) => (
+          <li class="tag">{tag}</li>
+        ))}
+      </ul>
+    )}
+
+    <Content />
+
+    {relatedLogs.length > 0 && (
+      <section class="panel">
+        <h2>Related Logs</h2>
+        <ul>
+          {relatedLogs.map((log) => (
+            <li>
+              <a href={`/logs/${log.id}/`}>{log.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, sortProjectsByUpdatedDesc } from '../../lib/content';
+
+const projects = (await getCollection('projects')).sort(sortProjectsByUpdatedDesc);
+const routeEntries = await Promise.all(projects.map((project) => getEntry(project.data.route)));
+const routesById = new Map(
+  routeEntries.filter((r): r is NonNullable<typeof r> => r != null).map((route) => [route.id, route]),
+);
+---
+
+<BaseLayout title="Projects | Workshop Terminal" description="Project hubs.">
+  <section class="hero">
+    <p class="eyebrow">Projects</p>
+    <h1>Projects</h1>
+    <p class="lede">Living hubs for ongoing or finished work.</p>
+  </section>
+
+  <section>
+    <ul class="card-grid">
+      {projects.map((project) => (
+        <li class="card">
+          <h2>
+            <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+          </h2>
+          <p>{project.data.description}</p>
+          <p class="meta">
+            <span>Status: {project.data.status}</span>
+            <span>Updated {formatDate(project.data.updatedAt)}</span>
+            <span>Route: {routesById.get(project.data.route.id)?.data.title ?? project.data.route.id}</span>
+          </p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

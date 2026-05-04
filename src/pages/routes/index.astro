@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const routes = await getCollection('routes');
+---
+
+<BaseLayout title="Routes | Workshop Terminal" description="Curated topic destinations.">
+  <section class="hero">
+    <p class="eyebrow">Routes</p>
+    <h1>Routes</h1>
+    <p class="lede">Curated destinations that group Logs and Projects.</p>
+  </section>
+
+  <section>
+    <ul class="card-grid">
+      {routes.map((route) => (
+        <li class="card">
+          <h2>
+            <a href={`/routes/${route.id}/`}>{route.data.title}</a>
+          </h2>
+          <p>{route.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
