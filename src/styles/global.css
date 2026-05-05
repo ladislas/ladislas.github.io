@@ -457,6 +457,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .card {
   padding: var(--space-5);
+  transition:
+    border-color var(--duration-fast) var(--easing-default),
+    box-shadow var(--duration-fast) var(--easing-default);
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .panel {
@@ -503,6 +511,7 @@ h1, h2, h3, h4, h5, h6 {
 .prose {
   display: grid;
   gap: var(--space-4);
+  max-width: 68ch;
   font-family: var(--font-body);
   line-height: var(--leading-relaxed);
 }
@@ -519,6 +528,25 @@ h1, h2, h3, h4, h5, h6 {
 /* Prose links are always underlined — colour alone is not enough (WCAG 1.4.1) */
 .prose a {
   text-decoration-color: currentColor;
+}
+
+/* Heading scale within prose */
+.prose h1 { font-size: var(--text-4xl); }
+.prose h2 { font-size: var(--text-2xl); }
+.prose h3 { font-size: var(--text-xl); }
+.prose h4 { font-size: var(--text-lg); }
+
+.prose blockquote {
+  border-left: 0.25rem solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
 }
 
 /* ------------------------------------------------------------
@@ -564,4 +592,80 @@ h1, h2, h3, h4, h5, h6 {
 
 .callout :last-child {
   margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------
+   CODE
+   ------------------------------------------------------------ */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.15em 0.4em;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  overflow-x: auto;
+}
+
+pre code {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 -1px 0 var(--color-border-strong);
+  padding: 0.1em 0.4em;
+}
+
+/* ------------------------------------------------------------
+   IMAGE TREATMENT
+   ------------------------------------------------------------ */
+
+/* Cover wrapper — album-cover cards and post heroes */
+.cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(var(--image-saturation)) brightness(var(--image-brightness));
+  transition: transform var(--duration-slow) var(--easing-out);
+}
+
+.cover--card {
+  aspect-ratio: var(--image-aspect-card);
+}
+
+.cover--hero {
+  aspect-ratio: var(--image-aspect-hero);
+  border-radius: var(--radius-lg);
+}
+
+/* Subtle zoom on card hover */
+.card:hover .cover img {
+  transform: scale(1.03);
 }
