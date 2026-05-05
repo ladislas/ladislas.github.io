@@ -269,6 +269,39 @@ a:hover {
   text-decoration-color: currentColor;
 }
 
+/* Focus ring — keyboard only, suppressed for mouse/touch */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip link — visually hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border: var(--focus-ring-width) solid var(--color-focus);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top var(--duration-fast) var(--easing-out);
+}
+
+.skip-link:focus-visible {
+  top: var(--space-4);
+}
+
 /* ------------------------------------------------------------
    LAYOUT
    ------------------------------------------------------------ */
@@ -481,6 +514,11 @@ h1, h2, h3, h4, h5, h6 {
 .prose ul,
 .prose ol {
   padding-left: var(--space-5);
+}
+
+/* Prose links are always underlined — colour alone is not enough (WCAG 1.4.1) */
+.prose a {
+  text-decoration-color: currentColor;
 }
 
 /* ------------------------------------------------------------
